@@ -431,23 +431,26 @@ class Lista {
     }
 
     
-     int getMaior(){
+     Serie getMaior(){
         Serie maior = array[0];
         for (int i = 0; i < n; i++) {
             if(maior.numDoidao < array[i].numDoidao){
                 maior = array[i];
             }
         }
-        return maior.numDoidao;
+        return maior;
+    }    
+   
+    public void countingSort(){
+       Serie x = getMaior();
+       int tamCount = x.getNumDoidao() + 1;
+       int[] count = new int[tamCount];
+
+
     }
 
-    
-
-    
-    
-    
-    
  }
+
 
 
 
@@ -486,7 +489,7 @@ class TP03Q10{
         //System.out.println("----------------");
         //System.out.println("ordenado");
         //System.out.println("----------------");
-    lista.radixSort();
+    lista.countingSort();
     lista.mostrar();
 
     }

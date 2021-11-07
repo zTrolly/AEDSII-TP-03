@@ -1,5 +1,6 @@
 import java.io.*;
 import java.io.FileReader;
+import java.util.Arrays;
 
 class Serie extends Lista{
     //declaração dos atributos
@@ -24,7 +25,7 @@ class Serie extends Lista{
         streaming = "";
         seasons = 0;
         episodes = 0;
-        numDoidao = 0;
+        // numDoidao = 0;
         
     }
     //construtor secundário
@@ -39,7 +40,7 @@ class Serie extends Lista{
         this.streaming = streaming;
         this.seasons = seasons;
         this.episodes = episodes;
-        this.numDoidao = numDoidao;
+        // this.numDoidao = numDoidao;
     }
     //método para setar o atributo name
     public void setName(String name){
@@ -78,9 +79,9 @@ class Serie extends Lista{
         this.episodes = episodes;
     }
     //método para setar o atributo numDoidao
-    public void setNumDoidao(int numDoidao){
-        this.numDoidao = numDoidao;
-    }
+    // public void setNumDoidao(int numDoidao){
+    //     this.numDoidao = numDoidao;
+    // }
     //método para retornar o atributo name
     public String getName(){ 
         return this.name; 
@@ -119,9 +120,9 @@ class Serie extends Lista{
     }
 
     //método para retornar o atributo numDoidao
-    public int getNumDoidao(){
-        return this.numDoidao;
-    }
+    // public int getNumDoidao(){
+    //     return this.numDoidao;
+    // }
     //método para clonar a classe
     public Serie clone(){
         Serie resp = new Serie();
@@ -134,13 +135,13 @@ class Serie extends Lista{
         resp.streaming = this.streaming;
         resp.seasons = this.seasons;
         resp.episodes = this.episodes;
-        resp.numDoidao = this.numDoidao;
+        // resp.numDoidao = this.numDoidao;
         return resp;
     }
     //método para printar a classe
     public void printClass(){
         System.out.println(this.name + " " + this.format + " " + this.duration + " " + this.country + " " + this.language + " " + this.broadcaster + " " +
-        this.streaming + " " + this.seasons + " " + this.episodes +" " +this.numDoidao);
+        this.streaming + " " + this.seasons + " " + this.episodes);
 
         // System.out.println(this.numDoidao);
     }
@@ -237,7 +238,7 @@ class Serie extends Lista{
             while(!br.readLine().contains("N.º de episódios"));
             this.episodes = justInt(removeTags(br.readLine()));
 
-            this.numDoidao = (this.episodes * 1000) + this.seasons;
+            // this.numDoidao = (this.episodes * 1000) + this.seasons;
             
             
             //fechamento do bufferedReader
@@ -431,26 +432,76 @@ class Lista {
     }
 
     
-     Serie getMaior(){
+     int getMaior(){
         Serie maior = array[0];
         for (int i = 0; i < n; i++) {
-            if(maior.numDoidao < array[i].numDoidao){
+            if(getNumDoidao(maior) < getNumDoidao(array[i])) {
                 maior = array[i];
             }
+
         }
-        return maior;
-    }    
-   
-    public void countingSort(){
-       Serie x = getMaior();
-       int tamCount = x.getNumDoidao() + 1;
-       int[] count = new int[tamCount];
+        return getNumDoidao(maior);
+    }
+	
+	public void sort() {
+		for (int i = 1; i < n; i++) {
+			Serie tmp = array[i];
+			int j = i - 1;
 
+			while ((j >= 0) && (array[j].getName().compareTo(tmp.getName()) > 0)){
+				array[j + 1] = array[j];
+				j--;
+			}
+			array[j + 1] = tmp;
+		}
+	}
+	
 
+    int getNumDoidao(Serie x){
+        return (x.getEpisodes() * 1000) + x.getSeasons();
     }
 
- }
+    void countingSort(int exp){
+        int tamCount = getMaior() + 1;
+        int[] count = new int[tamCount];
+        Serie[] ordenado = new Serie [n];
+ 
+        for(int i = 0; i < tamCount; count[i] = 0, i++);
+ 
+        for (int i = 0; i < n; count[(getNumDoidao(array[i]) / exp)%10]++, i++);
+ 
+        for(int i = 1; i < tamCount; count[i] += count[i-1], i++);
+ 
+        for(int i = n-1; i >= 0; ordenado[count[(getNumDoidao(array[i]) / exp)%10]-1] = array[i], count[(getNumDoidao(array[i]) / exp)%10]--, i--);
+ 
+        for(int i = 0; i < n; array[i] = ordenado[i], i++);
+ 
+     }
 
+     void radixSort(){
+         int m = getMaior();
+
+         for (int exp = 1; m/exp > 0; exp *= 10){
+            countingSort(exp);
+        }
+     }
+
+
+     
+
+    // void radixSort(){​​
+    // int m = getMaior();
+        
+        
+    //     for (int exp = 1; m/exp > 0; exp *= 10){
+    //         countingSort(exp);
+    //     }
+    // }​​​// End radixSort()
+    
+    
+    
+    
+ }
 
 
 
@@ -489,8 +540,8 @@ class TP03Q10{
         //System.out.println("----------------");
         //System.out.println("ordenado");
         //System.out.println("----------------");
-    lista.countingSort();
+	lista.sort();
+    lista.radixSort();
     lista.mostrar();
-
     }
 }

@@ -1,5 +1,7 @@
 import java.io.*;
 import java.io.FileReader;
+import java.util.Date;
+import java.io.RandomAccessFile;
 
 class Serie extends Lista {
     // declaração dos atributos
@@ -451,18 +453,21 @@ class Lista {
         // Alterar o vetor ignorando a posicao zero
         Serie[] tmp = new Serie[n + 1];
         for (int i = 0; i < n; i++) {
+            TP03Q05.contador++;
             tmp[i + 1] = array[i];
         }
         array = tmp;
 
         // Contrucao do heap
         for (int tamHeap = 2; tamHeap <= n; tamHeap++) {
+            TP03Q05.contador++;
             construir(tamHeap);
         }
 
         // Ordenacao propriamente dita
         int tamHeap = n;
         while (tamHeap > 1) {
+            TP03Q05.contador++;
             swap(1, tamHeap--);
             reconstruir(tamHeap);
         }
@@ -471,12 +476,14 @@ class Lista {
         tmp = array;
         array = new Serie[n];
         for (int i = 0; i < n; i++) {
+            TP03Q05.contador++;
             array[i] = tmp[i + 1];
         }
     }
 
     public void construir(int tamHeap) {
         for (int i = tamHeap; i > 1 && ((array[i].getFormat().compareTo(array[i / 2].getFormat()) > 0) || ((array[i].getFormat().compareTo(array[i / 2].getFormat()) == 0)&& (array[i].getName().compareTo(array[i / 2].getName()) > 0))); i /= 2) { 
+            TP03Q05.contador++;
             swap(i, i / 2);
         }
     }
@@ -486,12 +493,15 @@ class Lista {
         while (i <= (tamHeap / 2)) {
             int filho = getMaiorFilho(i, tamHeap);
             if (array[i].getFormat().compareTo(array[filho].getFormat()) < 0) {
+                TP03Q05.contador++;
                 swap(i, filho);
                 i = filho;
             } else if(array[i].getFormat().compareTo(array[filho].getFormat()) == 0 && array[i].getName().compareTo(array[filho].getName()) < 0){
                 swap(i, filho);
+                TP03Q05.contador++;
                 i = filho;
             } else {
+                TP03Q05.contador++;
                 i = tamHeap;
             }
         }
@@ -500,10 +510,13 @@ class Lista {
     public int getMaiorFilho(int i, int tamHeap) {
         int filho;
         if (2 * i == tamHeap || array[2 * i].getFormat().compareTo(array[2 * i + 1].getFormat()) > 0) {
+            TP03Q05.contador++;
             filho = 2 * i;
         } else if(2 * i == tamHeap || (array[2*i].getFormat().compareTo(array[2*i+1].getFormat()) == 0 && array[2*i].getName().compareTo(array[2*i+1].getName()) > 0)){
+            TP03Q05.contador++;
             filho = 2 * i;
         } else {
+            TP03Q05.contador++;
             filho = 2 * i + 1;
         }
         return filho;
@@ -511,6 +524,7 @@ class Lista {
 
     public void swap(int i, int primeiro) {
         Serie aux = array[i];
+        TP03Q05.contador++;
         array[i] = array[primeiro];
         array[primeiro] = aux;
     }
@@ -522,8 +536,12 @@ class Lista {
 
 class TP03Q05 {
 
-    // Salvando os itens no arra nao dara certo pois so ordenara os paises, e nao a
-    // linha inteira
+    public static int contador = 0; 
+    //Salvando os itens no arra nao dara certo pois so ordenara os paises, e nao a linha inteira
+    
+    public static long now(){
+        return new Date().getTime();
+    }
 
     public static boolean isFim(String s) {
         return (s.length() == 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
@@ -534,6 +552,10 @@ class TP03Q05 {
         String[] input = new String[1000];
         Lista lista = new Lista();
         int numInput = 0;
+        long inicio=0, fim=0;
+        double diferenca=0;
+
+        inicio = now();
 
         do {
             input[numInput] = MyIO.readLine();
@@ -542,6 +564,7 @@ class TP03Q05 {
 
         for (int i = 0; i < numInput; i++) {
             try {
+                TP03Q05.contador++;
                 serie = new Serie();
                 serie.readClass(input[i]);
                 // serie.printClass();
@@ -555,6 +578,15 @@ class TP03Q05 {
         // System.out.println("----------------");
         lista.heapSort();
         lista.mostrar();
+
+        fim = now();
+        diferenca = (fim - inicio) / 1000.0;
+
+        RandomAccessFile Arq = new RandomAccessFile("725777_heapsort.txt", "rw");
+
+        Arq.writeChars("725777" + "\t" + diferenca + "\t" + TP03Q05.contador);
+
+        Arq.close();
 
     }
 }

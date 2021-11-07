@@ -1,7 +1,9 @@
 import java.io.*;
 import java.io.FileReader;
+import java.util.Date;
+import java.io.RandomAccessFile;
 
-class Serie extends Lista {
+class Serie {
     // declaração dos atributos
     private String name;
     private String format;
@@ -461,21 +463,27 @@ class Lista {
         int i = esq, j = dir;
         Serie pivo = array[(dir + esq) / 2];
         while (i <= j) {
+            TP03Q06.contador++;
             while ((array[i].getCountry().compareTo(pivo.getCountry()) < 0) || ((array[i].getCountry().compareTo(pivo.getCountry()) == 0) && (array[i].getName().compareTo(pivo.getName()) < 0)))
                 i++;
             while ((array[j].getCountry().compareTo(pivo.getCountry()) > 0) || ((array[j].getCountry().compareTo(pivo.getCountry()) == 0) && (array[j].getName().compareTo(pivo.getName()) > 0)))
                 j--;
             
             if (i <= j) {
+                TP03Q06.contador++;
                 swap(i, j);
                 i++;
                 j--;
             }
         }
-        if (esq < j)
+        if (esq < j){
+            TP03Q06.contador++;
             quicksort(esq, j);
-        if (i < dir)
+        }
+        if (i < dir){
+            TP03Q06.contador++;
             quicksort(i, dir);
+        }
         
         
     }
@@ -492,8 +500,12 @@ class Lista {
 
 class TP03Q06 {
 
-    // Salvando os itens no arra nao dara certo pois so ordenara os paises, e nao a
-    // linha inteira
+    public static int contador = 0; 
+    //Salvando os itens no arra nao dara certo pois so ordenara os paises, e nao a linha inteira
+    
+    public static long now(){
+        return new Date().getTime();
+    }
 
     public static boolean isFim(String s) {
         return (s.length() == 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
@@ -504,6 +516,10 @@ class TP03Q06 {
         String[] input = new String[1000];
         Lista lista = new Lista();
         int numInput = 0;
+        long inicio=0, fim=0;
+        double diferenca=0;
+
+        inicio = now();
 
         do {
             input[numInput] = MyIO.readLine();
@@ -512,6 +528,7 @@ class TP03Q06 {
 
         for (int i = 0; i < numInput; i++) {
             try {
+                TP03Q06.contador++;
                 serie = new Serie();
                 serie.readClass(input[i]);
                 // serie.printClass();
@@ -526,5 +543,13 @@ class TP03Q06 {
         lista.quickSort();
         lista.mostrar();
 
+        fim = now();
+        diferenca = (fim - inicio) / 1000.0;
+
+        RandomAccessFile Arq = new RandomAccessFile("725777_quicksort.txt", "rw");
+
+        Arq.writeChars("725777" + "\t" + diferenca + "\t" + TP03Q06.contador);
+
+        Arq.close();
     }
 }

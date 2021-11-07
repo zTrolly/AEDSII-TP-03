@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <time.h>
 
 #define MAX_FIELD_SIZE 100
 //CLASSE SERIE
@@ -166,7 +166,7 @@ int isFim(char line[]) {
 #define bool      short
 #define true      1
 #define false     0
-
+int contador;
 
 Serie array[MAXTAM];   // Elementos da pilha 
 int n;               // Quantidade de array.
@@ -192,6 +192,7 @@ void inserirInicio(Serie x) {
    //levar elementos para o fim do array
    for(int i = n; i > 0; i--){
       array[i] = array[i-1];
+        contador++;
    }
 
    array[0] = x;
@@ -232,6 +233,7 @@ void inserir(Serie x, int pos) {
    //levar elementos para o fim do array
    for(int i = n; i > pos; i--){
       array[i] = array[i-1];
+      contador++;
    }
 
    array[pos] = x;
@@ -258,6 +260,7 @@ Serie removerInicio() {
 
    for(int i = 0; i < n; i++){
       array[i] = array[i+1];
+      contador++;
    }
 
    return resp;
@@ -300,6 +303,7 @@ Serie remover(int pos) {
 
    for(int i = pos; i < n; i++){
       array[i] = array[i+1];
+      contador++;
    }
 
    return resp;
@@ -341,25 +345,39 @@ void mostrar()
 }*/
 
 //========================CODIGO=DE=ORDENAÇÃO=========================================
-int getMaior() {
-    int maior = array[0].num_temporadas;
-    Serie tmp = array[0];
+Serie getMaior() {
+    Serie maior = array[0];
     for (int i = 0; i < n; i++) {
-        if(maior < array[i].num_temporadas){
-            maior = array[i].num_temporadas;
+        if(maior.num_temporadas < array[i].num_temporadas){
+            maior = array[i];
+            contador++;
         }
-        if(maior == array[i].num_temporadas && (strcmp(tmp.nome, array[i].nome) > 0)){
-            tmp = array[i].nome;
+        if(maior.num_temporadas == array[i].num_temporadas && (strcmp(maior.nome, array[i].nome) > 0)){
+            maior = array[i];
+            contador++;
         }
     }
     return maior;
 }
 //=============================================================================
+void sort() {
+	for (int i = 1; i < n; i++) {
+		Serie tmp = array[i];
+		int j = i - 1;
+		while ((j >= 0) && (strcmp(array[j].nome, tmp.nome))> 0 ){
+			array[j + 1] = array[j];
+			j--;
+		}
+		array[j + 1] = tmp;
+	}
+}
+
 void countingsort() {
     //Array para contar o numero de ocorrencias de cada elemento
-    int tamCount = getMaior() + 1;
+    Serie x = getMaior();
+    int tamCount = x.num_temporadas + 1;
     int count[tamCount];
-    int ordenado[n];
+    Serie ordenado[n];
 
     //Inicializar cada posicao do array de contagem 
     for (int i = 0; i < tamCount; count[i] = 0, i++);
@@ -371,10 +389,10 @@ void countingsort() {
     for(int i = 1; i < tamCount; count[i] += count[i-1], i++);
 
     //Ordenando
-    for(int i = n-1; i >= 0; ordenado[count[array[i].num_temporadas]-1] = array[i].num_temporadas, count[array[i].num_temporadas]--, i--);
+    for(int i = n-1; i >= 0; ordenado[count[array[i].num_temporadas]-1] = array[i], count[array[i].num_temporadas]--, i--);
 
     //Copiando para o array original
-    for(int i = 0; i < n; array[i].num_temporadas = ordenado[i], i++);
+    for(int i = 0; i < n; array[i] = ordenado[i], i++);
 }
 
 //================================MAIN==============================================
@@ -382,7 +400,8 @@ int main() {
     Serie serie;
     size_t tam_prefixo = strlen(PREFIXO);
     char line[MAX_LINE_SIZE];
-
+    clock_t t;
+    t = clock();
     strcpy(line, PREFIXO);
     readline(line + tam_prefixo, MAX_LINE_SIZE);
 
@@ -393,10 +412,19 @@ int main() {
         inserirFim(serie);
         readline(line + tam_prefixo, MAX_LINE_SIZE);
     }
-
+    sort();
     countingsort();
     mostrar();
+    t = clock() - t;
+
+    FILE *arq;
+   
+   arq = fopen("725777_countingsort.txt", "a");
+
+   fprintf(arq, "725777 \t %ld \t %d", t, contador);;
+
+   fclose(arq);
+
     return EXIT_SUCCESS;
 }
-
 

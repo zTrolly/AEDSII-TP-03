@@ -1,5 +1,7 @@
 import java.io.*;
 import java.io.FileReader;
+import java.util.Date;
+import java.io.RandomAccessFile;
 
 class Serie extends Lista{
     //declaração dos atributos
@@ -424,6 +426,7 @@ class Lista {
       */
      private void mergesort(int esq, int dir) {
         if (esq < dir){
+            TP03Q09.contador++;
            int meio = (esq + dir) / 2;
            mergesort(esq, meio);
            mergesort(meio + 1, dir);
@@ -454,15 +457,18 @@ class Lista {
         //Inicializar primeiro subarray
         for(i = 0; i < n1; i++){
            a1[i] = array[esq+i];
+           TP03Q09.contador++;
         }
   
         //Inicializar segundo subarray
         for(j = 0; j < n2; j++){
            a2[j] = array[meio+j+1];
+           TP03Q09.contador++;
         }
   
         //Sentinela no final dos dois arrays
-        a1[i] = a2[j] = sentinela;  
+        a1[i] = a2[j] = sentinela;
+        TP03Q09.contador++;  
   
         //Intercalacao propriamente dita
         for(i = j = 0, k = esq; k <= dir; k++){
@@ -478,9 +484,11 @@ class Lista {
  }
 
 class TP03Q09{
-
-    //Salvando os itens no arra nao dara certo pois so ordenara os paises, e nao a linha inteira
-    
+    public static int contador = 0; 
+ 
+    public static long now(){
+        return new Date().getTime();
+    }
     
 
     public static boolean isFim(String s) {
@@ -492,6 +500,10 @@ class TP03Q09{
         String[] input = new String[1000];
         Lista lista = new Lista();
         int numInput = 0;
+        long inicio=0, fim=0;
+        double diferenca=0;
+
+        inicio = now();
 
         do{
             input[numInput] = MyIO.readLine();
@@ -501,6 +513,7 @@ class TP03Q09{
 
         for(int i = 0; i < numInput;i++){
             try{
+                TP03Q09.contador++;
                 serie = new Serie();
                 serie.readClass(input[i]);
                 //serie.printClass();
@@ -515,6 +528,13 @@ class TP03Q09{
         lista.sort();
         lista.mostrar();
 
+        fim = now();
+        diferenca = (fim - inicio) / 1000.0;
 
+        RandomAccessFile Arq = new RandomAccessFile("725777_mergesort.txt", "rw");
+
+        Arq.writeChars("725777" + "\t" + diferenca + "\t" + TP03Q09.contador);
+
+        Arq.close();
     }
 }

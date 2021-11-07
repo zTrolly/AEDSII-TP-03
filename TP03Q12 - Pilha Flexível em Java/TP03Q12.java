@@ -1,9 +1,7 @@
 import java.io.*;
 import java.io.FileReader;
-import java.util.Date;
-import java.io.RandomAccessFile;
 
-class Serie extends Lista{
+class Serie{
     //declaração dos atributos
     private String name;
     private String format;
@@ -174,7 +172,9 @@ class Serie extends Lista{
         return resp.substring(0, resp.length()-5); //retorno da substring resp retirando os 5 últimos caracteres relacionados à extensão do arquivo
     }
     //método para leitura do arquivo .html e tratamento das linhas
-    public void readClass(String fileName) throws Exception{
+    public void readClass(String fileName){
+        String line;
+        String resp = "";
         String file = "/tmp/series/" + fileName;
         try {
             FileReader fileReader = new FileReader(file); //declaração da variável fileReader que será recebida pelo bufferedReader
@@ -184,7 +184,6 @@ class Serie extends Lista{
             //set nome da série
             this.name = searchName(fileName);
             
-
             //set Formato da série
             while(!br.readLine().contains("Formato"));
             this.format = removeTags(br.readLine()).trim();
@@ -212,18 +211,17 @@ class Serie extends Lista{
             //set transmissão original da série
             while(!br.readLine().contains("Transmissão original"));
             this.streaming = removeTags(br.readLine()).trim();
-            
 
             //set temporadas da série
             while(!br.readLine().contains("N.º de temporadas"));
             this.seasons = justInt(removeTags(br.readLine()));
-            
 
             //set episódios da série
             while(!br.readLine().contains("N.º de episódios"));
             this.episodes = justInt(removeTags(br.readLine()));
             
-            
+            //método para mostrar a classe
+            //this.printClass();
             //fechamento do bufferedReader
             br.close();         
         //Tratamento de exceções
@@ -232,269 +230,157 @@ class Serie extends Lista{
         } catch(IOException e) {
             System.out.println("Error reading file '" + fileName + "'");
         }
-        
     }
-} 
+}
 
-class Lista {
-    private Serie[] array;
-    private int n;
- 
- 
-    /**
-     * Construtor da classe.
-     */
-    public Lista () {
-       this(70);
-    }
- 
- 
-    /**
-     * Construtor da classe.
-     * @param tamanho Tamanho da lista.
-     */
-    public Lista (int tamanho){
-       array = new Serie[tamanho];
-       n = 0;
-    }
- 
- 
-    /**
-     * Insere um elemento na primeira posicao da lista e move os demais
-     * elementos para o fim da lista.
-     * @param x int elemento a ser inserido.
-     * @throws Exception Se a lista estiver cheia.
-     */
-    public void inserirInicio(Serie x) throws Exception {
- 
-       //validar insercao
-       if(n >= array.length){
-          throw new Exception("Erro ao inserir!");
-       } 
- 
-       //levar elementos para o fim do array
-       for(int i = n; i > 0; i--){
-          array[i] = array[i-1];
-       }
- 
-       array[0] = x;
-       n++;
-    }
- 
- 
-    /**
-     * Insere um elemento na ultima posicao da lista.
-     * @param x int elemento a ser inserido.
-     * @throws Exception Se a lista estiver cheia.
-     */
-    public void inserirFim(Serie x) throws Exception {
- 
-       //validar insercao
-       if(n >= array.length){
-          throw new Exception("Erro ao inserir!");
-       }
- 
-       array[n] = x;
-       n++;
-    }
- 
- 
-    /**
-     * Insere um elemento em uma posicao especifica e move os demais
-     * elementos para o fim da lista.
-     * @param x int elemento a ser inserido.
-     * @param pos Posicao de insercao.
-     * @throws Exception Se a lista estiver cheia ou a posicao invalida.
-     */
-    public void inserir(Serie x, int pos) throws Exception {
- 
-       //validar insercao
-       if(n >= array.length || pos < 0 || pos > n){
-          throw new Exception("Erro ao inserir!");
-       }
- 
-       //levar elementos para o fim do array
-       for(int i = n; i > pos; i--){
-          array[i] = array[i-1];
-       }
- 
-       array[pos] = x;
-       n++;
-    }
- 
- 
-    /**
-     * Remove um elemento da primeira posicao da lista e movimenta 
-     * os demais elementos para o inicio da mesma.
-     * @return resp int elemento a ser removido.
-     * @throws Exception Se a lista estiver vazia.
-     */
-    public Serie removerInicio() throws Exception {
- 
-       //validar remocao
-       if (n == 0) {
-          throw new Exception("Erro ao remover!");
-       }
- 
-       Serie resp = array[0];
-       n--;
- 
-       for(int i = 0; i < n; i++){
-          array[i] = array[i+1];
-       }
- 
-       return resp;
-    }
- 
- 
-    /**
-     * Remove um elemento da ultima posicao da lista.
-     * @return resp int elemento a ser removido.
-     * @throws Exception Se a lista estiver vazia.
-     */
-    public Serie removerFim() throws Exception {
- 
-       //validar remocao
-       if (n == 0) {
-          throw new Exception("Erro ao remover!");
-       }
- 
-       return array[--n];
-    }
- 
- 
-    /**
-     * Remove um elemento de uma posicao especifica da lista e 
-     * movimenta os demais elementos para o inicio da mesma.
-     * @param pos Posicao de remocao.
-     * @return resp int elemento a ser removido.
-     * @throws Exception Se a lista estiver vazia ou a posicao for invalida.
-     */
-    public Serie remover(int pos) throws Exception {
- 
-       //validar remocao
-       if (n == 0 || pos < 0 || pos >= n) {
-          throw new Exception("Erro ao remover!");
-       }
- 
-       Serie resp = array[pos];
-       n--;
- 
-       for(int i = pos; i < n; i++){
-          array[i] = array[i+1];
-       }
- 
-       return resp;
-    }
- 
- 
-    /**
-     * Mostra os elementos da lista separados por espacos.
-     */
-    public void mostrar (){
-       //System.out.print("[ ");
-       for(int i = 0; i < n; i++){
-          array[i].printClass();
-       }
-       //System.out.println("]");
-    }
- 
- 
-    /**
-     * Procura um elemento e retorna se ele existe.
-     * @param x int elemento a ser pesquisado.
-     * @return <code>true</code> se o array existir,
-     * <code>false</code> em caso contrario.
-     */
-    public boolean pesquisar(Serie x) {
-       boolean retorno = false;
-       for (int i = 0; i < n && retorno == false; i++) {
-          retorno = (array[i] == x);
-       }
-       return retorno;
-    }
-
-    public void SelectionSort() {
-        for (int i = 0; i < (n - 1); i++) {
-           int menor = i;
-           for (int j = (i + 1); j < n; j++){
-              if (array[menor].getCountry().compareTo(array[j].getCountry()) > 0 ){ 
-                TP03Q01.contador++; 
-                menor = j;
-              } else if(array[menor].getCountry().compareTo(array[j].getCountry()) == 0 ){
-                if(array[menor].getName().compareTo(array[j].getName()) > 0){
-                    TP03Q01.contador++;
-                    menor = j;
-                }
-              }
-           }
-           swap(menor, i);
-        }
-     }
-
-    public void swap(int i, int primeiro){
-        Serie aux = array[i];
-        array[i] = array[primeiro];
-        array[primeiro] = aux;
-    } 
+class Celula {
+	public Serie elemento; // Elemento inserido na celula.
+	public Celula prox; // Aponta a celula prox.
 
 
-    // 0  strings iguals
-    // > 0 Tem  letra 
- }
+	/**
+	 * Construtor da classe.
+	 */
+	public Celula() {
+		this(null);
+	}
 
-class TP03Q01{
-    public static int contador = 0; 
-    //Salvando os itens no arra nao dara certo pois so ordenara os paises, e nao a linha inteira
+	/**
+	 * Construtor da classe.
+	 * @param elemento int inserido na celula.
+	 */
+	public Celula(Serie elemento) {
+      this.elemento = elemento;
+      this.prox = null;
+	}
+}
+
+class Pilha {
+	private Celula topo;
+    private int qtd;
+
+	/**
+	 * Construtor da classe que cria uma fila sem elementos.
+	 */
+	public Pilha() {
+		topo = null;
+        qtd = 0;
+	}
+
+	/**
+	 * Insere elemento na pilha (politica FILO).
+	 * 
+	 * @param x int elemento a inserir.
+	 */
+	public void inserir(Serie x) {
+		Celula tmp = new Celula(x);
+		tmp.prox = topo;
+		topo = tmp;
+		tmp = null;
+	}
+
+	/**
+	 * Remove elemento da pilha (politica FILO).
+	 * 
+	 * @return Elemento removido.
+	 * @trhows Exception Se a sequencia nao contiver elementos.
+	 */
+	public Serie remover() {
+		if (topo == null) {
+			
+		}
+		Serie resp = topo.elemento;
+		Celula tmp = topo;
+		topo = topo.prox;
+		tmp.prox = null;
+		tmp = null;
+        qtd--;
+		return resp;
+	}
+
+	/**
+	 * Mostra os elementos separados por espacos, comecando do topo.
+	 */
+	public void mostrar() {
+		for (Celula i = topo; i != null; i = i.prox) {
+			i.elemento.printClass();
+		}
+	}
+
+	public void mostraPilha() {
+		mostraPilha(topo);
+	}
+
+	private void mostraPilha(Celula i) {
+		if (i != null) {
+			mostraPilha(i.prox);
+			i.elemento.printClass();
+		}
+	}
+    public int getQuantity() {
+        return qtd;
+    }
+
+
+}
+
+public class TP03Q12 {
     
-    public static long now(){
-        return new Date().getTime();
-    }
-
+    // Funcao que para a leitura da entrada quando recebe FIM
     public static boolean isFim(String s) {
-        return(s.length() == 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
+        return (s.length() == 3 && s.charAt(0) == 'F' && s.charAt(1) == 'I' && s.charAt(2) == 'M');
     }
 
-    public static void main(String[] args) throws Exception {
-        Serie serie = new Serie();
-        String[] input = new String[1000];
-        Lista lista = new Lista();
-        int numInput = 0;
-        long inicio=0, fim=0;
-        double diferenca=0;
-
-        inicio = now();
-
-        do{
-            input[numInput] = MyIO.readLine();
-        }while(isFim(input[numInput++]) == false);
-        numInput--;//Desconsiderar a palavra FIM
+    public static void alteraLista(String entrada, Serie series, Pilha pilha) {
+        int temp;
+        if (entrada.charAt(0) == 'I') {
+             // Entrada no inicio
+            series.readClass(entrada.substring(2)); 
+            // Retira o comando
+            pilha.inserir(series); 
+            // Insere na lista
+        } else if (entrada.charAt(0) == 'R') { 
+            series = new Serie();
+            series = pilha.remover(); 
+            System.out.println("(R) " + series.getName());
+        } 
         
+    }
 
-        for(int i = 0; i < numInput;i++){
-            try{
-                TP03Q01.contador++;
-                serie = new Serie();
-                serie.readClass(input[i]);
-                //serie.printClass();
-                lista.inserirFim(serie); 
-            }catch(Exception e){
-            }
+    public static void main(String[] args) {
+        String[] entrada = new String[1000];
+        Serie series = new Serie(); // Declaracao de serie
+        Pilha pilha = new Pilha(); // Declaracao de pilha
+        int n = 0, i, stop;
+
+
+        // Recebe a primeira parte da entrada
+        do {
+            entrada[n] = MyIO.readLine();
+        } while (isFim(entrada[n++]) == false);
+        // Salva as series na lista
+        for (i = 0; i < (n - 1); i++) {
+            series = new Serie();
+            series.readClass(entrada[i]);
+            pilha.inserir(series.clone());
         }
-        //lista.mostrar();
-        //System.out.println("----------------");
-        //System.out.println("ordenado");
-        //System.out.println("----------------");
-        lista.SelectionSort();
-        lista.mostrar();
         
-        fim = now();
-        diferenca = (fim - inicio) / 1000.0;
+        // Recebe a segunda parte da entrada
+        n = 0;
+        stop = MyIO.readInt(); // Recebe o total de alterações a serem feitas
+        do {
+            entrada[n] = MyIO.readLine();
+            n++;
+        } while (n < stop);
+        
+        // Realiza as alteracoes
+        for (i = 0; i < n; i++) {
+            alteraLista(entrada[i], series.clone(), pilha);
+        }
 
-        RandomAccessFile Arq = new RandomAccessFile("725777_selecao.txt", "rw");
-
-        Arq.writeChars("725777" + "\t" + diferenca + "\t" + TP03Q01.contador);
-
-        Arq.close();
+        // Imprime a lista final
+        pilha.mostrar();
+        
     }
+    
 }
